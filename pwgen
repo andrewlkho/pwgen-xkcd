@@ -1,0 +1,60 @@
+#!/usr/bin/awk -f
+
+BEGIN {
+    ############################################################################
+    # Number of words per password:
+    total_x = 5
+
+    # Separator between words in the password:
+    sep = "-"
+
+    # Capitalise the first word (helps with password-checking algorithms which
+    # require an upper case letter) -- 1 = yes, 0 = no
+    capitalise = 1
+
+    # Append a number (rationale same as above)
+    number = 1
+    ############################################################################
+
+    # Read in the list of words
+    ARGV[1] = "/usr/share/dict/words"
+    ARGC = 2
+
+    # Seed the random number generator
+    srand()
+}
+
+# Debian's /usr/share/dict/words has 99171 words, of which 42984 fulfill the 
+# criteria of being eight characters or fewer, and not containing an
+# apostrophe.  This will grab at least 100 words.
+!/'/ && (length($0) <= 8) && (rand() < 0.0053675) {
+    words[i++] = $0
+}
+
+END {
+    # Pick out random elements from words, add them to the output, and remove
+    # them from the words array (avoids duplication)
+    for (x = 1; x <= total_x; x++) {
+        while (! words[try_index]) {
+            try_index = int(i * rand())
+        }
+        output = output sep words[try_index]
+        delete words[try_index]
+        try_index = int(i * rand())
+    }
+
+    # Remove the starting separator and make everything lowercase
+    output = substr(tolower(output), length(sep) + 1)
+
+    # Append a single numerical digit
+    if (number) {
+        output = output sep int(10 * rand())
+    }
+
+    # Capitalise the first word
+    if (capitalise) {
+        output = toupper(substr(output, 1, 1)) substr(output, 2)
+    }
+
+    print output
+}
