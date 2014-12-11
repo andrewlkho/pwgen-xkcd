@@ -5,6 +5,9 @@ BEGIN {
     # Number of words per password:
     total_x = 5
 
+    # Maximum number of characters per word
+    max_chars = 8
+
     # Separator between words in the password:
     sep = "-"
 
@@ -27,11 +30,20 @@ BEGIN {
 # Debian's /usr/share/dict/words has 99171 words, of which 42984 fulfill the 
 # criteria of being eight characters or fewer, and not containing an
 # apostrophe.  This will grab at least 100 words.
-!/'/ && (length($0) <= 8) && (rand() < 0.0053675) {
+!/'/ && (length($0) <= max_chars) && (rand() < 0.005) {
     words[i++] = $0
 }
 
 END {
+    if (total_x > i) {
+        print \
+"\
+Not enough words selected from /usr/share/dict/words.  Either total_x is too \n\
+high or max_chars is too low.  Adjust them or increase 0.005 above.\
+"
+        exit -1
+    }
+
     # Pick out random elements from words, add them to the output, and remove
     # them from the words array (avoids duplication)
     for (x = 1; x <= total_x; x++) {
