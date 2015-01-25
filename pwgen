@@ -20,7 +20,7 @@ BEGIN {
     ############################################################################
 
     # Read in the list of words
-    ARGV[1] = "/usr/share/dict/words"
+    ARGV[1] = ARGV[1] ? ARGV[1] : "/usr/share/dict/words"
     ARGC = 2
 
     # Seed the random number generator
