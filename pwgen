@@ -20,8 +20,8 @@ BEGIN {
     ############################################################################
 
     # Read in the list of words
-    ARGV[1] = "/usr/share/dict/words"
-    ARGC = 2
+    ARGV[1] = ARGV[1] ? ARGV[1] : "/usr/share/dict/words"
+    ARGC = ARGC > 2 ? ARGC : 2
 
     # Seed the random number generator
     srand()
@@ -29,8 +29,8 @@ BEGIN {
 
 # Debian's /usr/share/dict/words has 99171 words, of which 42984 fulfill the 
 # criteria of being eight characters or fewer, and not containing an
-# apostrophe.  This will grab at least 100 words.
-!/'/ && (length($0) <= max_chars) && (rand() < 0.005) {
+# apostrophe or umlaut.  This will grab at least 100 words.
+/^[A-Za-z]+$/ && (length($0) <= max_chars) && (rand() < 0.005) {
     words[i++] = $0
 }
 
