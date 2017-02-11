@@ -20,27 +20,23 @@ BEGIN {
     ############################################################################
 
     # Read in the list of words
-    ARGV[1] = ARGV[1] ? ARGV[1] : "/usr/share/dict/words"
+    ARGV[1] = ARGV[1] ? ARGV[1] : "eff_large_wordlist.txt"
     ARGC = ARGC > 2 ? ARGC : 2
 
     # Seed the random number generator
     srand()
 }
 
-# Debian's /usr/share/dict/words has 99171 words, of which 42984 fulfill the 
-# criteria of being eight characters or fewer, and not containing an
-# apostrophe or umlaut.  This will grab at least 100 words.
-/^[A-Za-z]+$/ && (length($0) <= max_chars) && (rand() < 0.005) {
-    words[i++] = $0
+# Select appropriate words into the array `words`
+$2 ~ /^[a-zA-Z]+$/ && length($2) <= max_chars {
+    words[i++] = $2
 }
 
 END {
-    if (total_x > i) {
-        print \
-"\
-Not enough words selected from /usr/share/dict/words.  Either total_x is too \n\
-high or max_chars is too low.  Adjust them or increase 0.005 above.\
-"
+    # Sanity check: there should be over 1000 elements in the array `words`
+    # regardless of which EFF dictionary you use
+    if (i < 1000) {
+        print "Insufficient words: did you specify the correct dictionary?"
         exit -1
     }
 
