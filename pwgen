@@ -2,11 +2,14 @@
 
 BEGIN {
     ############################################################################
-    # Number of words per password:
-    total_x = 5
+    # Specify either the number of words per password (total_x) or the total
+    # length of the password (total_len).  Whichever is non-zero is used;
+    # if both a non-zero then total_len takes precedence.
+    total_x = 0
+    total_len = 32
 
     # Maximum number of characters per word
-    max_chars = 8
+    max_chars = 9
 
     # Separator between words in the password:
     sep = "-"
@@ -25,6 +28,9 @@ BEGIN {
 
     # Seed the random number generator
     srand()
+
+    # Sanity check
+    max_chars = (max_chars >= 3 && max_chars <= 9) ? max_chars : 9
 }
 
 # Select appropriate words into the array `words`
@@ -40,18 +46,51 @@ END {
         exit -1
     }
 
-    # Pick out random elements from words, add them to the output, and remove
-    # them from the words array (avoids duplication)
-    for (x = 1; x <= total_x; x++) {
-        while (! words[try_index]) {
-            try_index = int(i * rand())
+    if (total_len) {
+        # running_len is the complete length of the password that would be
+        # generated based on the output_arr so far
+        running_len = number
+
+        while (running_len < total_len) {
+            if ((total_len - running_len) <= (length(sep) + max_chars)) {
+                # Room for one more word of exact length:
+                # total_len - running_len - length(sep)
+                while (length(words[try_index]) != (total_len - running_len - length(sep))) {
+                    try_index = int(i * rand())
+                }
+            } else if ((total_len - running_len) < (length(sep) + max_chars + length(sep) + 3)) {
+                # A bit more room but not too long otherwise there won't be 
+                # enough space for the second word
+                while ((! words[try_index]) || length(words[try_index]) > (total_len - running_len - (length(sep) + 3 + length(sep)))) {
+                    try_index = int(i * rand())
+                }
+            } else {
+                # Enough room for any word
+                while (! words[try_index]) {
+                    try_index = int(i * rand())
+                }
+            }
+            output_arr[++x] = words[try_index]
+            running_len += length(sep) + length(words[try_index])
+            delete words[try_index]
         }
-        output = output sep words[try_index]
-        delete words[try_index]
-        try_index = int(i * rand())
+    } else if (total_x) {
+        for (x = 1; x <= total_x; x++) {
+            while (! words[try_index]) {
+                try_index = int(i * rand())
+            }
+            output_arr[x] = words[try_index]
+            delete words[try_index]
+        }
+    } else {
+        print "Error: both `len` and `total_x` are zero"
+        exit -1
     }
 
-    # Remove the starting separator and make everything lowercase
+    # Join the words together
+    for (w in output_arr) {
+        output = output sep output_arr[w]
+    }
     output = substr(tolower(output), length(sep) + 1)
 
     # Append a single numerical digit
