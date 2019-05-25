@@ -25,6 +25,6 @@ Requires python ≥ 3.6.
 I use it with the [EFF wordlist][1].  The `-e` argument is useful for doing 
 `pwgen.py eff_large_wordlist.txt | pbcopy`.
 
-[1]: https://www.eff.org/deeplinks/2016/07/new-wordlists-random-passphrases)
+[1]: https://www.eff.org/deeplinks/2016/07/new-wordlists-random-passphrases
 
 ![Password Strength](http://imgs.xkcd.com/comics/password_strength.png)
