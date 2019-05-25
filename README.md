@@ -1,4 +1,4 @@
-This is a password generator which generates passwords based on an algorithm 
+This is a passphrase generator which generates passphrase based on an algorithm 
 inspired by [xkcd #936](https://www.xkcd.com/936/).
 
 Requires python ≥ 3.6.
